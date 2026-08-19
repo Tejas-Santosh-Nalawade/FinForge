@@ -29,6 +29,7 @@ from reporters import (
     generate_excel_workpaper,
 )
 from forecasting import ForecastingEngine, generate_all_forecasting_charts
+from analytics import generate_all_analytics_charts
 
 
 def find_sub_datasets(data_path: Path) -> list:
@@ -84,13 +85,19 @@ def run_audit_on_dataset(
     engine = MathEngine(validated_schema)
     structured_report = engine.generate_structured_audit_report()
 
-    # Deliverable PDF Paths & Workpaper Paths
+    # Deliverable File Paths (PDFs, JSONs & Workpapers)
     audit_pdf_path = target_dir / "audit_tieouts_report.pdf"
-    fpa_pdf_path = target_dir / "fpa_analytics_report.pdf"
-    excel_workpaper_path = target_dir / "audit_workpaper_wp514.xlsx"
-    target_strat_pdf = target_dir / "fpa_strategic_planning_recommendations.pdf"
+    audit_json_path = target_dir / "audit_tieouts_report.json"
 
-    # 4. Construct In-Memory Audit & Analytics Payloads
+    fpa_pdf_path = target_dir / "fpa_analytics_report.pdf"
+    fpa_json_path = target_dir / "fpa_analytics_report.json"
+
+    target_strat_pdf = target_dir / "fpa_strategic_planning_recommendations.pdf"
+    target_strat_json = target_dir / "fpa_strategic_planning_recommendations.json"
+
+    excel_workpaper_path = target_dir / "audit_workpaper_wp514.xlsx"
+
+    # 4. Construct Audit & Analytics Payloads & Save JSONs
     det_procs = [
         p for p in structured_report.get("procedures", [])
         if any(str(p.get("reference", "")).startswith(prefix) for prefix in ("MATH_", "TIEOUT_", "PY_"))
@@ -109,6 +116,8 @@ def run_audit_on_dataset(
             "text": f"Deterministic Mechanical Audit Rules (28 Rules): {det_passed} / {len(det_procs)} passed."
         },
     }
+    audit_json_path.write_bytes(json.dumps(audit_payload, indent=2).encode("utf-8"))
+    print(f"[SUCCESS] Deliverable A JSON saved to '{audit_json_path}'")
 
     fpa_payload = {
         "engagement": structured_report.get("engagement"),
@@ -116,22 +125,32 @@ def run_audit_on_dataset(
         "findings": structured_report.get("findings"),
         "conclusion": structured_report.get("conclusion"),
     }
+    fpa_json_path.write_bytes(json.dumps(fpa_payload, indent=2).encode("utf-8"))
+    print(f"[SUCCESS] Deliverable B JSON saved to '{fpa_json_path}'")
 
     # 5. Generate Deliverable A PDF (Deterministic Math & Tie-Outs)
     generate_audit_tieouts_pdf(structured_report, audit_pdf_path)
     print(f"[SUCCESS] Deliverable A PDF saved to '{audit_pdf_path}'")
 
-    # 6. Generate Deliverable B PDF (Financial Analytics & FP&A Intelligence)
-    generate_fpa_analytics_pdf(structured_report, fpa_pdf_path)
+    # 6. Generate Analytics Charts & Deliverable B PDF (Financial Analytics & FP&A Intelligence)
+    chart_dir = target_dir / "charts"
+    curr_code = getattr(report_schema.metadata, "currency", "USD")
+    analytics_chart_paths = generate_all_analytics_charts(structured_report, chart_dir, currency=curr_code)
+
+    generate_fpa_analytics_pdf(structured_report, fpa_pdf_path, analytics_chart_paths)
     print(f"[SUCCESS] Deliverable B PDF saved to '{fpa_pdf_path}'")
 
-    # 7. Dynamically generate WP-514 Supporting Excel Workpaper in memory
+    # 7. Dynamically generate WP-514 Supporting Excel Workpaper
     generate_excel_workpaper(audit_payload, fpa_payload, excel_workpaper_path)
     print(f"[SUCCESS] Dynamic WP-514 Supporting Excel Workpaper saved to '{excel_workpaper_path}'")
 
-    # 8. Execute 4Q & 8Q Rolling Forecast Engine & Generate Strategic PDF
+    # 8. Execute 4Q & 8Q Rolling Forecast Engine & Save Strategic JSON/PDF
     print(f"[INFO] Executing 4Q & 8Q Rolling Forecast Engine for '{data_path}'...")
     forecaster = ForecastingEngine(report=report_schema)
+    payload_rec = forecaster.generate_strategic_recommendations_payload()
+    target_strat_json.write_bytes(json.dumps(payload_rec, indent=2).encode("utf-8"))
+    print(f"[SUCCESS] Saved Strategic Planning Recommendations JSON to '{target_strat_json}'")
+
     full_forecasting_data = forecaster.run_projections(total_quarters=8)
     chart_dir = target_dir / "charts"
     curr_code = getattr(report_schema.metadata, "currency", "USD")
@@ -140,13 +159,8 @@ def run_audit_on_dataset(
     generate_strategic_pdf_report(full_forecasting_data, chart_paths, target_strat_pdf)
     print(f"[SUCCESS] Saved Strategic Planning PDF Deliverable to '{target_strat_pdf}'")
 
-    # Clean up legacy/unneeded JSON files or old WP-514 PDF files if present in target_dir
+    # Clean up old WP-514 PDF files if present in target_dir
     for legacy_file in [
-        "audit_tieouts_report.json",
-        "fpa_analytics_report.json",
-        "forecast_4q.json",
-        "forecast_8q.json",
-        "strategic_planning_recommendations.json",
         "WP-514_Audit_Report_2026-03-31.pdf",
     ]:
         legacy_path = target_dir / legacy_file

@@ -5,10 +5,10 @@ Stage 3 Financial Analytics & FP&A Intelligence Report.
 """
 
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image
 
 from reporters.styles import (
     get_unified_styles,
@@ -30,7 +30,7 @@ def fmt_val(val: Any) -> str:
     return str(val)
 
 
-def generate_fpa_analytics_pdf(report: Dict[str, Any], output_path: Path) -> None:
+def generate_fpa_analytics_pdf(report: Dict[str, Any], output_path: Path, chart_paths: Optional[Dict[str, Path]] = None) -> None:
     """
     Deliverable B: fpa_analytics_report.pdf
     Focuses on Stage 3 Financial Analytics & FP&A Intelligence:
@@ -108,6 +108,11 @@ def generate_fpa_analytics_pdf(report: Dict[str, Any], output_path: Path) -> Non
         t_bs.setStyle(get_primary_table_style(header_bg=PRIMARY_NAVY))
         story.append(t_bs)
 
+    if chart_paths and "chart_2" in chart_paths and chart_paths["chart_2"].exists():
+        story.append(Spacer(1, 6))
+        story.append(Paragraph("Income Statement YoY Horizontal Growth Dashboard", st["bold"]))
+        story.append(Image(str(chart_paths["chart_2"]), width=510, height=215))
+
     story.append(Spacer(1, 8))
 
     # -------------------------------------------------------------------------
@@ -175,6 +180,11 @@ def generate_fpa_analytics_pdf(report: Dict[str, Any], output_path: Path) -> Non
         t_r = Table(r_table_data, colWidths=[70, 120, 140, 60, 70, 60])
         t_r.setStyle(get_primary_table_style(header_bg=PRIMARY_NAVY))
         story.append(t_r)
+
+    if chart_paths and "chart_1" in chart_paths and chart_paths["chart_1"].exists():
+        story.append(Spacer(1, 6))
+        story.append(Paragraph("Financial Ratio Performance vs. Benchmark Dashboard", st["bold"]))
+        story.append(Image(str(chart_paths["chart_1"]), width=510, height=215))
 
     story.append(Spacer(1, 8))
 

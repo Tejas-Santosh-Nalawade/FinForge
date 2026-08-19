@@ -17,6 +17,11 @@ from analytics.historical_analytics import (
     HistoricalAnalyticsEngine,
     calculate_historical_baseline_analytics,
 )
+from analytics.analytics_charts import (
+    generate_analytics_chart_1_ratios,
+    generate_analytics_chart_2_income_statement,
+    generate_all_analytics_charts,
+)
 
 __all__ = [
     "run_financial_analytics",
@@ -29,4 +34,7 @@ __all__ = [
     "calculate_cash_runway_velocity",
     "HistoricalAnalyticsEngine",
     "calculate_historical_baseline_analytics",
+    "generate_analytics_chart_1_ratios",
+    "generate_analytics_chart_2_income_statement",
+    "generate_all_analytics_charts",
 ]
