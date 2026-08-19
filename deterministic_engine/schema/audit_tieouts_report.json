@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AuditTieoutsReport",
+  "description": "JSON Template and Schema for Deliverable A: Deterministic Mechanical Audit & Tie-Outs Report (28 Core Audit Rules)",
+  "type": "object",
+  "required": [
+    "engagement",
+    "procedures",
+    "findings",
+    "conclusion"
+  ],
+  "properties": {
+    "engagement": {
+      "type": "object",
+      "description": "Metadata regarding client entity, reporting period, currency, scale, framework, and review stage.",
+      "required": ["client_name", "period", "currency", "scale", "framework", "review_stage"],
+      "properties": {
+        "client_name": { "type": "string", "example": "Google Global Inc." },
+        "period": { "type": "string", "format": "date", "example": "2026-03-31" },
+        "currency": { "type": "string", "example": "USD" },
+        "scale": { "type": "string", "enum": ["EXACT", "THOUSANDS", "MILLIONS", "BILLIONS"], "example": "MILLIONS" },
+        "framework": { "type": "string", "example": "US GAAP / IFRS" },
+        "review_stage": { "type": "string", "example": "CY_DRAFT_FS" }
+      }
+    },
+    "procedures": {
+      "type": "array",
+      "description": "Sequential log of 28 core deterministic mechanical audit rules (MATH_, TIEOUT_, PY_, NOTE_).",
+      "items": {
+        "type": "object",
+        "required": ["step", "category", "procedure", "reference", "status", "issue", "resolution"],
+        "properties": {
+          "step": { "type": "integer", "example": 1 },
+          "category": {
+            "type": "string",
+            "enum": [
+              "mathematical accuracy",
+              "internal consistency and cross statement tie outs",
+              "prior year comparative tie-outs",
+              "disclosure and footnote schedule tie-outs"
+            ],
+            "example": "mathematical accuracy"
+          },
+          "procedure": { "type": "string", "example": "Balance Sheet Equilibrium: Total Assets == Total Liabilities + Total Stockholders' Equity" },
+          "reference": { "type": "string", "example": "MATH_01" },
+          "status": { "type": "string", "enum": ["PASS", "FLAGGED", "FAIL"], "example": "PASS" },
+          "issue": { "type": ["string", "null"], "example": null },
+          "resolution": { "type": "string", "example": "no action required." }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "Array of audit exceptions and findings identified during procedure execution.",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "severity", "description", "expected", "actual", "difference", "confidence", "recommended_action", "status", "evidence"],
+        "properties": {
+          "id": { "type": "string", "example": "FINDING-001" },
+          "category": { "type": "string", "example": "Deterministic Assertion (MATH_01)" },
+          "severity": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"], "example": "Critical" },
+          "description": { "type": "string", "example": "Balance Sheet out of balance: Total Assets != Total Liabilities + Stockholders' Equity" },
+          "expected": { "type": "number", "example": 1500.00 },
+          "actual": { "type": "number", "example": 1450.00 },
+          "difference": { "type": "number", "example": -50.00 },
+          "confidence": { "type": "number", "example": 1.0 },
+          "recommended_action": { "type": "string", "example": "Rule failure conclusion: REJECTED. Investigate trial balance mapping discrepancy." },
+          "status": { "type": "string", "enum": ["OPEN", "RESOLVED", "WAIVED"], "example": "OPEN" },
+          "evidence": { "type": "array", "items": { "type": "string" }, "example": ["Assets: $1500.00M", "L+E: $1450.00M"] }
+        }
+      }
+    },
+    "conclusion": {
+      "type": "object",
+      "description": "Audit engagement gate conclusion status and mechanical rule execution metrics.",
+      "required": ["overall_status", "total_procedures_run", "procedures_passed", "text"],
+      "properties": {
+        "overall_status": { "type": "string", "enum": ["CLEARED", "REVIEW REQUIRED", "REJECTED"], "example": "CLEARED" },
+        "total_procedures_run": { "type": "integer", "example": 28 },
+        "procedures_passed": { "type": "integer", "example": 28 },
+        "text": { "type": "string", "example": "Deterministic Mechanical Audit Rules (28 Rules): 28 / 28 passed." }
+      }
+    }
+  }
+}

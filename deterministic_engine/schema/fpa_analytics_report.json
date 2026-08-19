@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FPAAnalyticsReport",
+  "description": "JSON Template and Schema for Deliverable B: Financial Analytics & FP&A Intelligence Report (Stage 3 Financial Analytics Engine)",
+  "type": "object",
+  "required": [
+    "engagement",
+    "analytics",
+    "findings",
+    "conclusion"
+  ],
+  "properties": {
+    "engagement": {
+      "type": "object",
+      "description": "Engagement metadata for client entity, reporting date, currency, scale, framework, and stage.",
+      "required": ["client_name", "period", "currency", "scale", "framework", "review_stage"],
+      "properties": {
+        "client_name": { "type": "string", "example": "Google Global Inc." },
+        "period": { "type": "string", "format": "date", "example": "2026-03-31" },
+        "currency": { "type": "string", "example": "USD" },
+        "scale": { "type": "string", "enum": ["EXACT", "THOUSANDS", "MILLIONS", "BILLIONS"], "example": "MILLIONS" },
+        "framework": { "type": "string", "example": "US GAAP / IFRS" },
+        "review_stage": { "type": "string", "example": "CY_DRAFT_FS" }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "description": "Stage 3 Financial Analytics & FP&A Intelligence Datasets.",
+      "required": [
+        "income_statement",
+        "balance_sheet",
+        "ratios",
+        "relationship_disconnects",
+        "bva_attainment",
+        "historical_baseline_analytics",
+        "cash_runway_velocity"
+      ],
+      "properties": {
+        "income_statement": {
+          "type": "array",
+          "description": "Horizontal & Vertical Income Statement YoY Variance Analytics (ANALYTICS_01 / 02 / 04).",
+          "items": {
+            "type": "object",
+            "required": ["line_item", "prior_period", "current_period", "variance", "variance_pct", "threshold_status", "commentary"],
+            "properties": {
+              "line_item": { "type": "string", "example": "Revenue" },
+              "prior_period": { "type": "number", "example": 1258.59 },
+              "current_period": { "type": "number", "example": 1406.50 },
+              "variance": { "type": "number", "example": 147.91 },
+              "variance_pct": { "type": "number", "example": 11.75 },
+              "threshold_status": { "type": "string", "enum": ["YES", "NO"], "example": "NO" },
+              "commentary": { "type": "string", "example": "Revenue changed by $+147.91 (+11.8%) YoY." }
+            }
+          }
+        },
+        "balance_sheet": {
+          "type": "array",
+          "description": "Horizontal & Vertical Balance Sheet YoY Variance Analytics (ANALYTICS_03).",
+          "items": {
+            "type": "object",
+            "required": ["line_item", "prior_period", "current_period", "variance", "variance_pct", "threshold_status", "commentary"],
+            "properties": {
+              "line_item": { "type": "string", "example": "Cash & Cash Equivalents" },
+              "prior_period": { "type": "number", "example": 450.20 },
+              "current_period": { "type": "number", "example": 512.80 },
+              "variance": { "type": "number", "example": 62.60 },
+              "variance_pct": { "type": "number", "example": 13.90 },
+              "threshold_status": { "type": "string", "enum": ["YES", "NO"], "example": "NO" },
+              "commentary": { "type": "string", "example": "Cash & Cash Equivalents changed by $+62.60 (+13.9%) YoY." }
+            }
+          }
+        },
+        "ratios": {
+          "type": "array",
+          "description": "11 Core Financial Ratios across Liquidity, Leverage, Solvency, Activity, and Profitability.",
+          "items": {
+            "type": "object",
+            "required": ["category", "name", "formula", "prior_period", "current_period", "benchmark", "status", "assessment"],
+            "properties": {
+              "category": { "type": "string", "example": "Liquidity" },
+              "name": { "type": "string", "example": "Current Ratio" },
+              "formula": { "type": "string", "example": "Total Current Assets / Total Current Liabilities" },
+              "prior_period": { "type": "number", "example": 2.45 },
+              "current_period": { "type": "number", "example": 2.52 },
+              "benchmark": { "type": "string", "example": ">= 1.50x" },
+              "status": { "type": "string", "enum": ["PASS", "WARNING", "CRITICAL"], "example": "PASS" },
+              "assessment": { "type": "string", "example": "Current Ratio is 2.52x vs prior period 2.45x." }
+            }
+          }
+        },
+        "relationship_disconnects": {
+          "type": "array",
+          "description": "Universal Relationship Disconnect Rules (REL_01 through REL_06).",
+          "items": {
+            "type": "object",
+            "required": ["rule_id", "rule_name", "metric_value", "threshold", "status", "audit_implication"],
+            "properties": {
+              "rule_id": { "type": "string", "example": "REL_01" },
+              "rule_name": { "type": "string", "example": "Revenue Growth vs. Accounts Receivable Growth Disconnect" },
+              "metric_value": { "type": "number", "example": 2.50 },
+              "threshold": { "type": "number", "example": 15.00 },
+              "status": { "type": "string", "enum": ["PASS", "FLAGGED", "FAIL"], "example": "PASS" },
+              "audit_implication": { "type": "string", "example": "AR growth matches Revenue trajectory. No aggressive revenue recognition indicated." }
+            }
+          }
+        },
+        "bva_attainment": {
+          "type": "object",
+          "description": "Sub-Module 3B: Budget vs. Actual (BvA) Attainment Matrix and Driver Productivity.",
+          "required": ["bva_line_items", "driver_unit_variances"],
+          "properties": {
+            "bva_line_items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["line_item", "actual_amount", "budget_amount", "dollar_variance", "attainment_pct", "status"],
+                "properties": {
+                  "line_item": { "type": "string", "example": "Revenue" },
+                  "actual_amount": { "type": "number", "example": 1406.50 },
+                  "budget_amount": { "type": "number", "example": 1463.03 },
+                  "dollar_variance": { "type": "number", "example": -56.53 },
+                  "attainment_pct": { "type": "number", "example": 96.14 },
+                  "status": { "type": "string", "enum": ["ON TARGET", "BELOW TARGET", "EXCEEDED"], "example": "ON TARGET" }
+                }
+              }
+            },
+            "driver_unit_variances": {
+              "type": "object",
+              "required": ["realized_revenue_per_unit", "revenue_per_headcount", "opex_per_headcount"],
+              "properties": {
+                "realized_revenue_per_unit": { "type": "number", "example": 13023.15 },
+                "revenue_per_headcount": { "type": "number", "example": 2704807.69 },
+                "opex_per_headcount": { "type": "number", "example": 970057.69 }
+              }
+            }
+          }
+        },
+        "historical_baseline_analytics": {
+          "type": "object",
+          "description": "Historical Multi-Year Baseline & Trend Analysis (3-Yr CAGR & Bps Shifts).",
+          "required": ["cagr_3yr", "margin_trajectories", "working_capital_velocity_shifts"],
+          "properties": {
+            "cagr_3yr": {
+              "type": "object",
+              "properties": {
+                "revenue_cagr_pct": { "type": "number", "example": 8.54 },
+                "opex_cagr_pct": { "type": "number", "example": 6.21 }
+              }
+            },
+            "margin_trajectories": {
+              "type": "object",
+              "properties": {
+                "gross_margin_bps_shift": { "type": "number", "example": 75.40 },
+                "current_gross_margin_pct": { "type": "number", "example": 54.86 },
+                "operating_margin_bps_shift": { "type": "number", "example": 85.20 },
+                "current_operating_margin_pct": { "type": "number", "example": 19.00 }
+              }
+            },
+            "working_capital_velocity_shifts": {
+              "type": "object",
+              "properties": {
+                "ccc_days_shift": { "type": "number", "example": -2.40 },
+                "current_ccc_days": { "type": "number", "example": 68.10 },
+                "current_dso_days": { "type": "number", "example": 52.30 },
+                "current_dio_days": { "type": "number", "example": 52.00 },
+                "current_dpo_days": { "type": "number", "example": 36.20 }
+              }
+            }
+          }
+        },
+        "cash_runway_velocity": {
+          "type": "object",
+          "description": "Sub-Module 3D: Dynamic Cash Runway & Working Capital Velocity Profile.",
+          "required": [
+            "cash_conversion_cycle_days",
+            "total_cash_reserves",
+            "trailing_operating_cash_flow",
+            "monthly_net_cash_burn",
+            "cash_runway_months",
+            "runway_alert_triggered",
+            "runway_guardrail_status"
+          ],
+          "properties": {
+            "cash_conversion_cycle_days": { "type": "number", "example": 68.10 },
+            "total_cash_reserves": { "type": "number", "example": 512.80 },
+            "trailing_operating_cash_flow": { "type": "number", "example": 280.40 },
+            "monthly_net_cash_burn": { "type": "number", "example": 0.00 },
+            "cash_runway_months": { "type": "number", "example": 99.00 },
+            "runway_alert_triggered": { "type": "boolean", "example": false },
+            "runway_guardrail_status": { "type": "string", "enum": ["HEALTHY", "WARNING", "CRITICAL"], "example": "HEALTHY" }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "List of flagged analytics anomalies, ratio breaches, or relationship disconnect findings.",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "severity", "description", "expected", "actual", "difference", "confidence", "recommended_action", "status", "evidence"],
+        "properties": {
+          "id": { "type": "string", "example": "FINDING-ANALYTICS-001" },
+          "category": { "type": "string", "example": "Relationship Disconnect (REL_01)" },
+          "severity": { "type": "string", "enum": ["Low", "Medium", "High", "Critical"], "example": "High" },
+          "description": { "type": "string", "example": "Accounts Receivable growth (28.5%) significantly exceeds Revenue growth (8.2%)" },
+          "expected": { "type": "number", "example": 8.20 },
+          "actual": { "type": "number", "example": 28.50 },
+          "difference": { "type": "number", "example": 20.30 },
+          "confidence": { "type": "number", "example": 0.95 },
+          "recommended_action": { "type": "string", "example": "Perform extended audit testing on Q4 aging schedules and uncollected balances." },
+          "status": { "type": "string", "enum": ["OPEN", "RESOLVED", "WAIVED"], "example": "OPEN" },
+          "evidence": { "type": "array", "items": { "type": "string" }, "example": ["Rev Growth: 8.2%", "AR Growth: 28.5%"] }
+        }
+      }
+    },
+    "conclusion": {
+      "type": "object",
+      "description": "Executive summary analytics conclusion status.",
+      "required": ["overall_status", "total_procedures_run", "procedures_passed", "text"],
+      "properties": {
+        "overall_status": { "type": "string", "enum": ["CLEARED", "REVIEW REQUIRED", "REJECTED"], "example": "CLEARED" },
+        "total_procedures_run": { "type": "integer", "example": 28 },
+        "procedures_passed": { "type": "integer", "example": 28 },
+        "text": { "type": "string", "example": "Stage 3 Financial Analytics & Disconnect Suite: 28 / 28 procedures cleared." }
+      }
+    }
+  }
+}
