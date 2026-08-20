@@ -78,6 +78,61 @@ Deterministic Engine
 Frontend visualization + report downloads
 ```
 
+## Product Screenshots & Architecture Views
+
+<table border="1" cellpadding="12" cellspacing="0" style="border-collapse:collapse; width:100%; border:1px solid #d0d7de; border-radius:8px;">
+  <tr>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/dasboard.jpg" alt="Dashboard" width="520" /><br>
+      <strong>Dashboard</strong>
+    </td>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/upload.jpg" alt="Upload Data" width="520" /><br>
+      <strong>Upload Data</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/dataview.jpg" alt="Data Review" width="520" /><br>
+      <strong>Data Review & Exceptions</strong>
+    </td>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/anlaytics.jpg" alt="Financial Analytics" width="520" /><br>
+      <strong>Financial Analytics</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/orecasr.jpg" alt="Forecast" width="520" /><br>
+      <strong>Forecast & Scenario Planning</strong>
+    </td>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/insight.jpg" alt="Insights" width="520" /><br>
+      <strong>Insights & Recommendations</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/aireview.jpg" alt="AI Financial Review" width="520" /><br>
+      <strong>AI Financial Review</strong>
+    </td>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/wp514.jpg" alt="WP-514" width="520" /><br>
+      <strong>WP-514 Working Paper</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/reports.jpg" alt="Reports and Exports" width="520" /><br>
+      <strong>Reports & Exports</strong>
+    </td>
+    <td align="center" valign="top" style="border:1px solid #d0d7de; padding:12px;">
+      <img src="architecture/math.jpg" alt="Deterministic Rule Inspection" width="520" /><br>
+      <strong>Deterministic Rule Inspection</strong>
+    </td>
+  </tr>
+</table>
+
 ## Repository Structure
 
 ```text
