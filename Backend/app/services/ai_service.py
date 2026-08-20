@@ -10,8 +10,6 @@ PROJECT_ROOT = SERVICE_DIR.parents[2]
 ENGINE_DIR = PROJECT_ROOT / "deterministic_engine"
 RESULT_DIR = ENGINE_DIR / "result"
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 
 def call_gemini_api(prompt: str) -> Optional[str]:
     """
@@ -20,6 +18,7 @@ def call_gemini_api(prompt: str) -> Optional[str]:
     key = os.getenv("GEMINI_API_KEY")
     if not key:
         return None
+
     models = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash"]
     
     for model in models:
