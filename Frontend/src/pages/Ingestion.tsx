@@ -1,4 +1,5 @@
-import { ArrowRight, Circle, FileSpreadsheet, FileType, File, Clock, UploadCloud } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowRight, Circle, FileSpreadsheet, FileType, File, Clock, UploadCloud, CheckCircle2, RefreshCw } from 'lucide-react';
 import { WorkflowIndicator } from '@/components/ui/WorkflowIndicator';
 import { defaultIngestionPipeline } from '@/config/navigation';
 import { IngestionStep, UploadedFile } from '@/types/financial';
@@ -12,9 +13,40 @@ interface IngestionProps {
 export function Ingestion({
   onNavigate,
   files = [],
-  steps = defaultIngestionPipeline,
+  steps: initialSteps = defaultIngestionPipeline,
 }: IngestionProps) {
   const hasFiles = files.length > 0;
+  
+  const [currentStepIndex, setCurrentStepIndex] = useState(hasFiles ? 0 : -1);
+  const [pipelineSteps, setPipelineSteps] = useState<IngestionStep[]>(initialSteps);
+
+  useEffect(() => {
+    if (!hasFiles) return;
+
+    if (currentStepIndex >= 0 && currentStepIndex < pipelineSteps.length) {
+      const timer = setTimeout(() => {
+        setPipelineSteps((prev) =>
+          prev.map((step, idx) => {
+            if (idx < currentStepIndex) return { ...step, status: 'complete' };
+            if (idx === currentStepIndex) return { ...step, status: 'active' };
+            return step;
+          })
+        );
+        
+        setTimeout(() => {
+          setPipelineSteps((prev) =>
+            prev.map((step, idx) => {
+              if (idx <= currentStepIndex) return { ...step, status: 'complete' };
+              return step;
+            })
+          );
+          setCurrentStepIndex((prev) => prev + 1);
+        }, 1200);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStepIndex, hasFiles, pipelineSteps.length]);
+
 
   return (
     <div className="animate-fade-in space-y-5">
@@ -62,17 +94,27 @@ export function Ingestion({
           </div>
 
           <div className="space-y-1.5">
-            {steps.map((step) => (
+            {pipelineSteps.map((step) => (
               <div
                 key={step.id}
-                className="flex items-center gap-3 p-2.5 rounded bg-slate-50 border border-border-subtle"
+                className="flex items-center gap-3 p-2.5 rounded bg-slate-50 border border-border-subtle transition-colors duration-300"
               >
-                <div className="shrink-0 text-slate-400">
-                  <Circle size={15} />
+                <div className="shrink-0">
+                  {step.status === 'complete' ? (
+                    <CheckCircle2 size={15} className="text-status-success" />
+                  ) : step.status === 'active' ? (
+                    <RefreshCw size={15} className="text-accent animate-spin" />
+                  ) : (
+                    <Circle size={15} className="text-slate-400" />
+                  )}
                 </div>
-                <span className="text-xs font-medium text-slate-600 flex-1">{step.label}</span>
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                  {step.status}
+                <span className={`text-xs font-medium flex-1 ${step.status === 'active' ? 'text-accent' : 'text-slate-600'}`}>
+                  {step.label}
+                </span>
+                <span className={`text-[11px] font-semibold uppercase tracking-wider ${
+                  step.status === 'complete' ? 'text-status-success' : step.status === 'active' ? 'text-accent' : 'text-slate-400'
+                }`}>
+                  {step.status === 'active' ? 'PROCESSING' : step.status}
                 </span>
               </div>
             ))}

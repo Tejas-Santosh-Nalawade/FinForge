@@ -81,10 +81,11 @@ const pageMeta: Record<PageId, { title: string; description: string }> = {
 
 function App() {
   const [page, setPage] = useState<PageId>('dashboard');
+  const [selectedDataset, setSelectedDataset] = useState<string>('error_data');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [companyProfile, setCompanyProfile] = useState<CompanyProfile>({
-    name: '',
-    period: '',
+    name: 'Enterprise Operating Entity',
+    period: 'FY2025/2026',
     currency: 'USD',
   });
 
@@ -94,7 +95,13 @@ function App() {
   const renderPage = () => {
     switch (page) {
       case 'dashboard':
-        return <Dashboard onNavigate={navigate} />;
+        return (
+          <Dashboard
+            onNavigate={navigate}
+            selectedDataset={selectedDataset}
+            onDatasetChange={setSelectedDataset}
+          />
+        );
       case 'upload':
         return (
           <UploadData
@@ -106,38 +113,19 @@ function App() {
       case 'ingestion':
         return <Ingestion onNavigate={navigate} files={uploadedFiles} />;
       case 'data-review':
-        return <DataReview onNavigate={navigate} />;
+        return <DataReview onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'analytics':
-        return (
-          <FinancialAnalytics
-            onNavigate={navigate}
-            companyName={companyProfile.name}
-            period={companyProfile.period}
-            currency={companyProfile.currency}
-          />
-        );
+        return <FinancialAnalytics onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'forecast':
-        return <Forecast onNavigate={navigate} />;
+        return <Forecast onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'insights':
-        return <Insights onNavigate={navigate} />;
+        return <Insights onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'ai-review':
-        return <AIReview onNavigate={navigate} />;
+        return <AIReview onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'wp514':
-        return (
-          <WP514
-            onNavigate={navigate}
-            entityName={companyProfile.name}
-            reportingPeriod={companyProfile.period}
-          />
-        );
+        return <WP514 onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'reports':
-        return (
-          <Reports
-            onNavigate={navigate}
-            companyName={companyProfile.name}
-            period={companyProfile.period}
-          />
-        );
+        return <Reports onNavigate={navigate} selectedDataset={selectedDataset} />;
       case 'settings':
         return (
           <SettingsPage
@@ -148,7 +136,13 @@ function App() {
       case 'profile':
         return <ProfilePage />;
       default:
-        return <Dashboard onNavigate={navigate} />;
+        return (
+          <Dashboard
+            onNavigate={navigate}
+            selectedDataset={selectedDataset}
+            onDatasetChange={setSelectedDataset}
+          />
+        );
     }
   };
 
@@ -161,8 +155,8 @@ function App() {
             <PageHeader
               title={meta.title}
               description={meta.description}
-              company={companyProfile.name || '—'}
-              period={companyProfile.period || '—'}
+              company={selectedDataset.toUpperCase()}
+              period={companyProfile.period || 'FY2025/2026'}
               currency={companyProfile.currency || 'USD'}
               notifications={0}
               userName="FP&A Team"
@@ -235,15 +229,6 @@ function SettingsPage({ companyProfile, onUpdateProfile }: SettingsPageProps) {
               className="input"
             />
           </div>
-        </div>
-
-        <div>
-          <label className="kpi-label mb-1 block">Validation Strictness</label>
-          <select className="input" defaultValue="Standard">
-            <option>Standard (Recommended for Quarterly Review)</option>
-            <option>Strict (Required for Statutory Audit)</option>
-            <option>Relaxed (Preliminary Modeling)</option>
-          </select>
         </div>
       </div>
     </div>
